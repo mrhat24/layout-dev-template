@@ -50,6 +50,10 @@ let files = [
         name: './src/sass/components/_components.sass',
         content: ''
     },
+    {
+        name: './src/sass/plugins/_plugins.sass',
+        content: ''
+    },
 ];
 
 dirs.forEach(function (item) {
