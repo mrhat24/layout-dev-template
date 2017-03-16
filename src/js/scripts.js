@@ -1,1 +1,2 @@
-var styles = require('../sass/styles.sass');
+let styles = require('../sass/styles.sass');
+

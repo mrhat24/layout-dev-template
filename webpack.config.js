@@ -12,7 +12,6 @@ module.exports = function (env) {
         devServer: {
             contentBase: path.join(__dirname, "dist"),
             port: 9000,
-            hot: true
         },
         devtool: 'eval',
         module: {
@@ -39,7 +38,9 @@ module.exports = function (env) {
                 template: '!!html-loader?interpolate=require!./src/index.html',
                 inject: 'html'
             }),
-            new ExtractTextPlugin("css/styles.css")
+            new ExtractTextPlugin("css/styles.css"),
+            new webpack.HotModuleReplacementPlugin(),
+            new webpack.NamedModulesPlugin()
         ]
     }
 };
