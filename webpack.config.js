@@ -15,14 +15,14 @@ module.exports = function (env) {
             hot: true
         },
         devtool: 'eval',
-            module: {
+        module: {
             rules: [
                 {
                     test: /\.sass$/,
                     use: ExtractTextPlugin.extract({
                         fallback: 'style-loader',
-                        use: 'css-loader?modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]!sass-loader'
-                    }),
+                        use: 'css-loader?modules&importLoaders=1&localIdentName=[local]!autoprefixer-loader!sass-loader'
+                    })
                 },
                 {
                     test: /\.html/,
@@ -30,7 +30,7 @@ module.exports = function (env) {
                 },
                 {
                     test: /\.(jpe?g|png|gif|svg)$/i,
-                    use: "file-loader?name=./images/[name].[ext]"
+                    use: "file- loader?name=./images/[name].[ext]"
                 }
             ]
         },
