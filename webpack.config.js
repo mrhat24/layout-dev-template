@@ -2,6 +2,7 @@ var path = require('path');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 var webpack = require('webpack');
+var UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 module.exports = function (env) {
     const nodeEnv = env && env.prod ? 'production' : 'development';
     const isProd = nodeEnv === 'production';
@@ -17,27 +18,7 @@ module.exports = function (env) {
     ]
     if (isProd) {
         plugins.push(
-            new webpack.LoaderOptionsPlugin({
-                minimize: true,
-                debug: false
-            }),
-            new webpack.optimize.UglifyJsPlugin({
-                compress: {
-                    warnings: false,
-                    screw_ie8: true,
-                    conditionals: true,
-                    unused: true,
-                    comparisons: true,
-                    sequences: true,
-                    dead_code: true,
-                    evaluate: true,
-                    if_return: true,
-                    join_vars: true,
-                },
-                output: {
-                    comments: false,
-                },
-            })
+            new UglifyJSPlugin()
         );
     } else {
         plugins.push(
@@ -52,7 +33,7 @@ module.exports = function (env) {
             filename: 'js/bundle.js'
         },
         devServer: {
-            contentBase: path.join(__dirname, "dist"),
+            contentBase: path.join(__dirname, "src"),
             port: 9000
         },
         devtool: isProd ? 'source-map' : 'eval',
@@ -72,6 +53,13 @@ module.exports = function (env) {
                 {
                     test: /\.(jpe?g|png|gif|svg)$/i,
                     use: "file- loader?name=./images/[name].[ext]"
+                },
+                {
+                    test: /\.(js)$/,
+                    exclude: /node_modules/,
+                    use: [
+                        'babel-loader'
+                    ],
                 }
             ]
         },
