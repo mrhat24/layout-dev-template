@@ -3,6 +3,48 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 var webpack = require('webpack');
 module.exports = function (env) {
+    const nodeEnv = env && env.prod ? 'production' : 'development';
+    const isProd = nodeEnv === 'production';
+    var plugins = [
+        new HtmlWebpackPlugin({
+            template: '!!html-loader?interpolate=require!./src/index.html',
+            inject: 'html'
+        }),
+        new ExtractTextPlugin("css/styles.css"),
+        new webpack.DefinePlugin({
+            'process.env.NODE_ENV': JSON.stringify('production')
+        })
+    ]
+    if (isProd) {
+        plugins.push(
+            new webpack.LoaderOptionsPlugin({
+                minimize: true,
+                debug: false
+            }),
+            new webpack.optimize.UglifyJsPlugin({
+                compress: {
+                    warnings: false,
+                    screw_ie8: true,
+                    conditionals: true,
+                    unused: true,
+                    comparisons: true,
+                    sequences: true,
+                    dead_code: true,
+                    evaluate: true,
+                    if_return: true,
+                    join_vars: true,
+                },
+                output: {
+                    comments: false,
+                },
+            })
+        );
+    } else {
+        plugins.push(
+            new webpack.NamedModulesPlugin(),
+            new webpack.HotModuleReplacementPlugin()
+        );
+    };
     return {
         entry: ['./src/js/scripts.js'],
         output: {
@@ -11,9 +53,9 @@ module.exports = function (env) {
         },
         devServer: {
             contentBase: path.join(__dirname, "dist"),
-            port: 9000,
+            port: 9000
         },
-        devtool: 'eval',
+        devtool: isProd ? 'source-map' : 'eval',
         module: {
             rules: [
                 {
@@ -33,14 +75,6 @@ module.exports = function (env) {
                 }
             ]
         },
-        plugins: [
-            new HtmlWebpackPlugin({
-                template: '!!html-loader?interpolate=require!./src/index.html',
-                inject: 'html'
-            }),
-            new ExtractTextPlugin("css/styles.css"),
-            new webpack.HotModuleReplacementPlugin(),
-            new webpack.NamedModulesPlugin()
-        ]
+        plugins: plugins
     }
 };
