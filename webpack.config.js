@@ -2,6 +2,7 @@ var path = require('path');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 var webpack = require('webpack');
+var CleanWebpackPlugin = require('clean-webpack-plugin');
 var UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 module.exports = function (env) {
     const nodeEnv = env && env.prod ? 'production' : 'development';
@@ -11,15 +12,24 @@ module.exports = function (env) {
             template: '!!html-loader?interpolate=require!./src/index.html',
             inject: 'html'
         }),
-        new ExtractTextPlugin("css/styles.css"),
+        new ExtractTextPlugin("styles.css"),
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify('production')
+        }),
+        new webpack.ProvidePlugin({
+            $: 'jquery',
+            jQuery: 'jquery'
         })
     ]
     if (isProd) {
         plugins.push(
             new UglifyJSPlugin()
         );
+        plugins.push(new CleanWebpackPlugin(['dist'], {
+            root: path.join(__dirname, ""),
+            verbose: true,
+            dry: false
+        }));
     } else {
         plugins.push(
             new webpack.NamedModulesPlugin(),
@@ -52,14 +62,15 @@ module.exports = function (env) {
                 },
                 {
                     test: /\.(jpe?g|png|gif|svg)$/i,
-                    use: "file- loader?name=./images/[name].[ext]"
+                    use: "file-loader?name=./images/[name].[ext]"
                 },
                 {
                     test: /\.(js)$/,
                     exclude: /node_modules/,
-                    use: [
-                        'babel-loader'
-                    ],
+                    loader: 'babel-loader',
+                    options: {
+                        presets: ['es2015']
+                    }
                 }
             ]
         },
