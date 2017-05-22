@@ -44,7 +44,9 @@ module.exports = function (env) {
         },
         devServer: {
             contentBase: path.join(__dirname, "src"),
-            port: 9000
+            port: 9000,
+            host: "0.0.0.0",
+            disableHostCheck: true
         },
         devtool: isProd ? 'source-map' : 'eval',
         module: {
