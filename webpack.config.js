@@ -4,13 +4,13 @@ var ExtractTextPlugin = require("extract-text-webpack-plugin");
 var webpack = require('webpack');
 var CleanWebpackPlugin = require('clean-webpack-plugin');
 var UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+var pages = require('./src/pages');
 module.exports = function (env) {
     const nodeEnv = env && env.prod ? 'production' : 'development';
     const isProd = nodeEnv === 'production';
     var plugins = [
-        new HtmlWebpackPlugin({
-            template: '!!html-loader?interpolate=require!./src/index.html',
-            inject: 'html'
+        new webpack.DefinePlugin({
+            'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
         }),
         new ExtractTextPlugin("styles.css"),
         new webpack.DefinePlugin({
@@ -21,10 +21,22 @@ module.exports = function (env) {
             jQuery: 'jquery'
         })
     ]
+
+    for(let i = 0; i < pages.length; i++){
+        if(pages[i]){
+            let page = pages[i];
+            plugins.push(new HtmlWebpackPlugin({
+                filename: page.name,
+                template: '!!html-loader?interpolate=require!./src/'+page.name,
+                inject: 'html'
+            }));
+        }
+    }
+
     if (isProd) {
-        plugins.push(
-            new UglifyJSPlugin()
-        );
+        // plugins.push(
+        //     new UglifyJSPlugin()
+        // );
         plugins.push(new CleanWebpackPlugin(['dist'], {
             root: path.join(__dirname, ""),
             verbose: true,
@@ -37,10 +49,13 @@ module.exports = function (env) {
         );
     };
     return {
-        entry: ['./src/js/scripts.js'],
+        entry: {
+            vendor: ['jquery','./src/js/scripts.js'],
+            app: './src/js/app.js'
+        },
         output: {
             path: path.join(__dirname, "dist"),
-            filename: 'js/bundle.js'
+            filename: 'js/[name].js'
         },
         devServer: {
             contentBase: path.join(__dirname, "src"),
@@ -59,8 +74,23 @@ module.exports = function (env) {
                     })
                 },
                 {
+                    test: /\.css/,
+                    use: ExtractTextPlugin.extract({
+                        fallback: 'style-loader',
+                        use: 'css-loader'
+                    })
+                },
+                {
                     test: /\.html/,
                     use: 'html-loader'
+                },
+                {
+                    test: /\.(md)$/i,
+                    use: "file-loader?name=./[name].[ext]"
+                },
+                {
+                    test: /\.(ttf|otf|woff|woff2|eot)$/i,
+                    use: "file-loader?name=./fonts/[name].[ext]"
                 },
                 {
                     test: /\.(jpe?g|png|gif|svg)$/i,

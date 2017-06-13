@@ -1,0 +1,31 @@
+.dev-nav
+  position: fixed
+  bottom: 0
+  right: 0
+  width: 200px
+  z-index: 50
+  background-color: #535353
+  &.active
+    .dev-nav-body
+      max-height: 60vh
+  &-title
+    height: 24px
+    text-align: center
+    font-size: 16px
+    box-shadow: 0 0 3px #fff
+    @extend .btn
+    color: #ffffff
+  &-body
+    display: flex
+    flex-direction: column
+    overflow-y: scroll
+    max-height: 0vh
+    @extend .btn
+    overflow-x: hidden
+    transition: all 0.4s ease
+    a
+      color: #ffffff
+      text-align: center
+      border-bottom: 1px solid #ffffff
+      padding: 3px
+      display: block
