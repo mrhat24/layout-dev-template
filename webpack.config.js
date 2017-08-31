@@ -19,15 +19,25 @@ module.exports = function (env) {
         new webpack.ProvidePlugin({
             $: 'jquery',
             jQuery: 'jquery'
+        }),
+        new webpack.optimize.CommonsChunkPlugin({
+            name: "vendor",
+
+            // filename: "vendor.js"
+            // (Give the chunk a different name)
+
+            minChunks: Infinity,
+            // (with more entries, this ensures that no other module
+            //  goes into the vendor chunk)
         })
-    ]
+    ];
 
     for(let i = 0; i < pages.length; i++){
         if(pages[i]){
             let page = pages[i];
             plugins.push(new HtmlWebpackPlugin({
                 filename: page.name,
-                template: '!!html-loader?interpolate=require!./src/'+page.name,
+                template: '!!html-loader?interpolate=require!./src/pages/'+page.name,
                 inject: 'html'
             }));
         }
@@ -50,7 +60,7 @@ module.exports = function (env) {
     };
     return {
         entry: {
-            vendor: ['jquery','./src/js/scripts.js'],
+            vendor: ['babel-polyfill','jquery','./src/js/scripts.js'],
             app: './src/js/app.js'
         },
         output: {
