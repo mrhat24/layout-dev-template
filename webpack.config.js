@@ -80,7 +80,19 @@ module.exports = function (env) {
                     test: /\.sass$/,
                     use: ExtractTextPlugin.extract({
                         fallback: 'style-loader',
-                        use: 'css-loader?modules&importLoaders=1&localIdentName=[local]!autoprefixer-loader!sass-loader'
+                        use: [
+                            {loader: 'css-loader', options: {modules: true, importLoaders: 1, localIdentName: '[local]', minimize: process.env.NODE_ENV == 'production'}},
+                            {loader: 'postcss-loader', options: {
+                                config: {
+                                    ctx: {
+                                        cssnext: {},
+                                        autoprefixer: { browsers: 'last 100 versions', grid: true },
+                                        cssnano: {}
+                                    }
+                                }
+                            }},
+                            {loader: 'sass-loader'}
+                        ]
                     })
                 },
                 {

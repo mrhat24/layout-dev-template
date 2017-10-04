@@ -30,7 +30,9 @@
     "style-loader": "^0.18.2",
     "uglifyjs-webpack-plugin": "^0.4.6",
     "webpack": "^3.5.5",
-    "webpack-dev-server": "^2.7.1"
+    "webpack-dev-server": "^2.7.1",
+    "postcss-loader": "^2.0.6",
+    "postcss-write-svg": "github:jonathantneal/postcss-write-svg"
   },
   "dependencies": {
     "animate.css": "^3.5.2",
@@ -40,6 +42,10 @@
     "extract-loader": "^1.0.1",
     "file-loader": "^0.10.1",
     "gulp-clean-css": "^3.7.0",
+    "postcss-cssnext": "^3.0.2",
+    "postcss-import": "^11.0.0",
+    "postcss-inline-svg": "^3.0.0",
+    "postcss-svgo": "^2.1.6",
     "imports-loader": "^0.7.1",
     "jquery": "^3.2.1",
     "jquery-nice-select": "^1.1.0",
