@@ -1,5 +1,5 @@
 let isProd = process.env.NODE_ENV == 'production';
-let pages = require("../pages");
+let pages = process.env.pages;
 if(isProd){
     let devStyles = require('../dev.sass');
 }

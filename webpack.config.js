@@ -4,8 +4,23 @@ var ExtractTextPlugin = require("extract-text-webpack-plugin");
 var webpack = require('webpack');
 var CleanWebpackPlugin = require('clean-webpack-plugin');
 var UglifyJSPlugin = require('uglifyjs-webpack-plugin');
-var pages = require('./src/pages');
-module.exports = function (env) {
+var CopyWebpackPlugin = require('copy-webpack-plugin');
+var multi = require("multi-loader");
+var fs = require('fs');
+function readDir (dir){
+    return new Promise((resolve, reject) => {
+        fs.readdir(dir, function(err, list) {
+            if(err){
+                reject(err)
+            }else{
+                resolve(list.map(elem => {return {'name': elem}; }));
+            }
+        });
+    })
+}
+
+module.exports = async function (env) {
+    let pages = await readDir("./src/pages");
     const nodeEnv = env && env.prod ? 'production' : 'development';
     const isProd = nodeEnv === 'production';
     var plugins = [
@@ -14,11 +29,13 @@ module.exports = function (env) {
         }),
         new ExtractTextPlugin("styles.css"),
         new webpack.DefinePlugin({
-            'process.env.NODE_ENV': JSON.stringify('production')
+            'process.env.NODE_ENV': JSON.stringify('production'),
+            'process.env.pages': JSON.stringify(pages)
         }),
         new webpack.ProvidePlugin({
             $: 'jquery',
-            jQuery: 'jquery'
+            jQuery: 'jquery',
+            Popper: ['popper.js', 'default']
         }),
         new webpack.optimize.CommonsChunkPlugin({
             name: "vendor",
@@ -60,7 +77,11 @@ module.exports = function (env) {
     };
     return {
         entry: {
-            vendor: ['babel-polyfill','jquery','./src/js/scripts.js'],
+            vendor: [
+                'babel-polyfill',
+                'jquery',
+                'bootstrap',
+                './src/js/scripts.js'],
             app: './src/js/app.js'
         },
         output: {
@@ -73,7 +94,7 @@ module.exports = function (env) {
             host: "0.0.0.0",
             disableHostCheck: true
         },
-        devtool: isProd ? 'source-map' : 'eval',
+        devtool: isProd ? false : 'eval',
         module: {
             rules: [
                 {
