@@ -7,6 +7,10 @@ var UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 var CopyWebpackPlugin = require('copy-webpack-plugin');
 var multi = require("multi-loader");
 var fs = require('fs');
+
+require('dotenv').config({path: fs.existsSync('.env') ? '.env' : 'default.env'});
+
+
 function readDir (dir){
     return new Promise((resolve, reject) => {
         fs.readdir(dir, function(err, list) {
@@ -64,7 +68,7 @@ module.exports = async function (env) {
         // plugins.push(
         //     new UglifyJSPlugin()
         // );
-        plugins.push(new CleanWebpackPlugin(['dist'], {
+        plugins.push(new CleanWebpackPlugin([process.env.DIST_DIR ? process.env.DIST_DIR : "dist"], {
             root: path.join(__dirname, ""),
             verbose: true,
             dry: false
@@ -85,7 +89,7 @@ module.exports = async function (env) {
             app: './src/js/app.js'
         },
         output: {
-            path: path.join(__dirname, "dist"),
+            path: path.join(__dirname, process.env.DIST_DIR ? process.env.DIST_DIR : "dist"),
             filename: 'js/[name].js'
         },
         devServer: {

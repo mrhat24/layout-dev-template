@@ -1,7 +1,8 @@
 let isProd = process.env.NODE_ENV == 'production';
 let pages = process.env.pages;
-if(isProd){
-    let devStyles = require('../dev.sass');
+window.$ = window.jQuery = require('jquery');
+if(!isProd){
+    require('../dev.sass');
 }
 
 $(document).ready(()=>{

@@ -3,3 +3,4 @@ node_modules
 dist
 psd
 npm-debug.log
+.env
