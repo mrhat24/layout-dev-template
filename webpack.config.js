@@ -40,16 +40,6 @@ module.exports = async function (env) {
             $: 'jquery',
             jQuery: 'jquery',
             Popper: ['popper.js', 'default']
-        }),
-        new webpack.optimize.CommonsChunkPlugin({
-            name: "vendor",
-
-            // filename: "vendor.js"
-            // (Give the chunk a different name)
-
-            minChunks: Infinity,
-            // (with more entries, this ensures that no other module
-            //  goes into the vendor chunk)
         })
     ];
 
@@ -141,7 +131,7 @@ module.exports = async function (env) {
                 },
                 {
                     test: /\.(jpe?g|png|gif|svg)$/i,
-                    use: "file-loader?name=./images/[name].[ext]"
+                    use: "file-loader?name=./img/[name].[ext]"
                 },
                 {
                     test: /\.(js)$/,
