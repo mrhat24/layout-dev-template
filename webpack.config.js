@@ -144,7 +144,17 @@ module.exports = async function (env) {
         },
         plugins: plugins,
         optimization: {
-            minimize: false
+            minimize: false,
+            splitChunks: {
+                cacheGroups: {
+                    default: false,
+                    commons: {
+                        test: /node_modules/,
+                        name: "vendor",
+                        chunks: "all",
+                    }
+                }
+            }
         }
     }
 };
