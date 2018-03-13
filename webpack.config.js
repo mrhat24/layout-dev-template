@@ -3,7 +3,6 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 var webpack = require('webpack');
 var CleanWebpackPlugin = require('clean-webpack-plugin');
-var UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 var CopyWebpackPlugin = require('copy-webpack-plugin');
 var multi = require("multi-loader");
 var fs = require('fs');
@@ -143,6 +142,9 @@ module.exports = async function (env) {
                 }
             ]
         },
-        plugins: plugins
+        plugins: plugins,
+        optimization: {
+            minimize: false
+        }
     }
 };
