@@ -9,10 +9,16 @@ build-app:
     - yarn install
   script:
     - yarn run build
-    - mkdir -p ./public
-    - cp -r ./dist/* ./public
     - tar -cf - dist | gzip > dist.gz
   artifacts:
       paths:
       - dist.gz
-      - public
+
+pages:
+  image: alpine:latest
+  script:
+    - mkdir -p ./public
+    - cp -r ./dist/* ./public
+  artifacts:
+    paths:
+    - public
