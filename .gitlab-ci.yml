@@ -5,8 +5,9 @@ stages:
 
 build-app:
   stage: build
-  script:
+  before_script:
     - yarn install
+  script:
     - yarn run build
     - mkdir -p ./public
     - cp ./dist/* ./public
