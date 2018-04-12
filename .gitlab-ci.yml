@@ -1,0 +1,17 @@
+image: node:latest
+
+stages:
+  - build
+
+build-app:
+  stage: build
+  script:
+    - yarn install
+    - yarn run build
+    - mkdir -p ./public
+    - cp ./dist/* ./public
+    - tar -cf - dist | gzip > dist.gz
+  artifacts:
+      paths:
+      - dist.gz
+      - public
