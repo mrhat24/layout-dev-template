@@ -10,7 +10,7 @@ build-app:
   script:
     - yarn run build
     - mkdir -p ./public
-    - cp ./dist/* ./public
+    - cp -r ./dist/* ./public
     - tar -cf - dist | gzip > dist.gz
   artifacts:
       paths:
