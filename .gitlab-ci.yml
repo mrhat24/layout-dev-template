@@ -2,24 +2,17 @@ image: node:latest
 
 stages:
   - build
-  - pages
 
-build-app:
+pages:
   stage: build
   before_script:
     - yarn install
   script:
     - yarn run build
-    - tar -cf - dist | gzip > dist.gz
-  artifacts:
-      paths:
-      - dist.gz
-
-pages:
-  stage: pages
-  script:
     - mkdir -p ./public
     - cp -r ./dist/* ./public
+    - tar -cf - dist | gzip > dist.gz
   artifacts:
     paths:
     - public
+    - dist.gz
