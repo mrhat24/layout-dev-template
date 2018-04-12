@@ -2,6 +2,7 @@ image: node:latest
 
 stages:
   - build
+  - pages
 
 build-app:
   stage: build
@@ -15,7 +16,7 @@ build-app:
       - dist.gz
 
 pages:
-  image: alpine:latest
+  stage: pages
   script:
     - mkdir -p ./public
     - cp -r ./dist/* ./public
