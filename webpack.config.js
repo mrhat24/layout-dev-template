@@ -3,20 +3,41 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 var webpack = require('webpack');
 var CleanWebpackPlugin = require('clean-webpack-plugin');
+var UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 var CopyWebpackPlugin = require('copy-webpack-plugin');
 var multi = require("multi-loader");
 var fs = require('fs');
 
 require('dotenv').config({path: fs.existsSync('.env') ? '.env' : 'default.env'});
 
+function getHtmlPluginConfig(HTML_LOADER, page) {
+    console.log('HTML_LOADER', HTML_LOADER);
+    switch (HTML_LOADER) {
+        case 'pug': {
+            return {
+                filename: page.name + '.html',
+                template: './src/pages/' + page.name + '.pug',
+                inject: true
+            };
+        }
+        default:
+            return {
+                filename: page.name,
+                template: '!!html-loader?interpolate=require!./src/pages/'+page.name+'.html',
+                inject: 'html'
+            };
+    }
+}
 
-function readDir (dir){
+function readDir(dir) {
     return new Promise((resolve, reject) => {
-        fs.readdir(dir, function(err, list) {
-            if(err){
+        fs.readdir(dir, function (err, list) {
+            if (err) {
                 reject(err)
-            }else{
-                resolve(list.map(elem => {return {'name': elem}; }));
+            } else {
+                resolve(list.filter(elem => path.extname(elem) == '.'+process.env.HTML_LOADER).map(elem => {
+                    return {'name': path.basename(elem, path.extname(elem))};
+                }));
             }
         });
     })
@@ -45,11 +66,7 @@ module.exports = async function (env) {
     for(let i = 0; i < pages.length; i++){
         if(pages[i]){
             let page = pages[i];
-            plugins.push(new HtmlWebpackPlugin({
-                filename: page.name,
-                template: '!!html-loader?interpolate=require!./src/pages/'+page.name,
-                inject: 'html'
-            }));
+            plugins.push(new HtmlWebpackPlugin(getHtmlPluginConfig(process.env.HTML_LOADER, page)));
         }
     }
 
@@ -121,6 +138,10 @@ module.exports = async function (env) {
                     use: 'html-loader'
                 },
                 {
+                    test: /\.pug/,
+                    use: 'pug-loader'
+                },
+                {
                     test: /\.(md)$/i,
                     use: "file-loader?name=./[name].[ext]"
                 },
@@ -145,6 +166,11 @@ module.exports = async function (env) {
         plugins: plugins,
         optimization: {
             minimize: false,
+            minimizer: [
+                new UglifyJSPlugin({
+                    test: /\/vendor.js$/i
+                })
+            ],
             splitChunks: {
                 cacheGroups: {
                     default: false,
