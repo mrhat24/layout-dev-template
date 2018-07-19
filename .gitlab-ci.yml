@@ -9,6 +9,7 @@ build-app:
   before_script:
     - yarn install
   script:
+    - cp default.env .env
     - yarn run build
     - tar -cf - dist | gzip > dist.gz
   artifacts:
