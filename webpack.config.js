@@ -7,6 +7,7 @@ var UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 var CopyWebpackPlugin = require('copy-webpack-plugin');
 var multi = require("multi-loader");
 var fs = require('fs');
+var HtmlBeautifyPlugin = require('html-beautify-webpack-plugin');
 
 require('dotenv').config({path: fs.existsSync('.env') ? '.env' : 'default.env'});
 
@@ -85,13 +86,24 @@ module.exports = async function (env) {
             new webpack.HotModuleReplacementPlugin()
         );
     };
+    plugins.push(new HtmlBeautifyPlugin({
+        config: {
+            html: {
+                end_with_newline: true,
+                indent_size: 2,
+                indent_with_tabs: true,
+                indent_inner_html: true,
+                preserve_newlines: true,
+                unformatted: ['p', 'i', 'b', 'span'],
+            }
+        }
+    }));
     return {
         entry: {
             vendor: [
-                'babel-polyfill',
-                'jquery',
-                'bootstrap',
-                './src/js/scripts.js'],
+                // "jquery",
+                "babel-polyfill"
+            ],
             app: './src/js/app.js'
         },
         output: {
@@ -165,7 +177,7 @@ module.exports = async function (env) {
         },
         plugins: plugins,
         optimization: {
-            minimize: false,
+            minimize: true,
             minimizer: [
                 new UglifyJSPlugin({
                     test: /\/vendor.js$/i
