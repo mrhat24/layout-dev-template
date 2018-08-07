@@ -13,7 +13,7 @@ $(document).ready(()=>{
                     <div class='dev-nav-body'></div>
                     </div>`);
             for(let page of pages){
-                $(".dev-nav-body").append(`<a href="${page.name}" class='dev-nav-element'>${page.name}</a>`);
+                $(".dev-nav-body").append(`<a href="${page.name}.html" class='dev-nav-element'>${page.name}</a>`);
             }
 
             $(".dev-nav-title").on("click", function () {
