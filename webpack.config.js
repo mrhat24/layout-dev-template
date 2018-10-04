@@ -11,6 +11,8 @@ var HtmlBeautifyPlugin = require('html-beautify-webpack-plugin');
 
 require('dotenv').config({path: fs.existsSync('.env') ? '.env' : 'default.env'});
 
+const extractSASS = new ExtractTextPlugin({ filename: '[name].css' });
+
 function getHtmlPluginConfig(HTML_LOADER, page) {
     console.log('HTML_LOADER', HTML_LOADER);
     switch (HTML_LOADER) {
@@ -47,12 +49,13 @@ function readDir(dir) {
 module.exports = async function (env) {
     let pages = await readDir("./src/pages");
     const nodeEnv = env && env.prod ? 'production' : 'development';
-    const isProd = nodeEnv === 'production';
+    const isProd = env.prod;
     var plugins = [
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
         }),
-        new ExtractTextPlugin("styles.css"),
+        extractSASS,
+        //new ExtractTextPlugin("styles.css"),
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify('production'),
             'process.env.pages': JSON.stringify(pages)
@@ -98,14 +101,16 @@ module.exports = async function (env) {
             }
         }
     }));
+    let entry = {
+        vendor: [
+            // "jquery",
+            "babel-polyfill"
+        ],
+        app: './src/js/app.js',
+        dev: "./src/js/dev.js"
+    };
     return {
-        entry: {
-            vendor: [
-                // "jquery",
-                "babel-polyfill"
-            ],
-            app: './src/js/app.js'
-        },
+        entry: entry,
         output: {
             path: path.join(__dirname, process.env.DIST_DIR ? process.env.DIST_DIR : "dist"),
             filename: 'js/[name].js'
@@ -121,10 +126,10 @@ module.exports = async function (env) {
             rules: [
                 {
                     test: /\.sass$/,
-                    use: ExtractTextPlugin.extract({
+                    use: extractSASS.extract({
                         fallback: 'style-loader',
                         use: [
-                            {loader: 'css-loader', options: {modules: true, importLoaders: 1, localIdentName: '[local]', minimize: process.env.NODE_ENV == 'production'}},
+                            {loader: 'css-loader', options: {modules: true, importLoaders: 1, localIdentName: '[local]', minimize: isProd}},
                             {loader: 'postcss-loader', options: {
                                 config: {
                                     ctx: {
