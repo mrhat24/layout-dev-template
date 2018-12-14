@@ -1,0 +1,49 @@
+@mixin flexElements($count, $margin) {
+  $a: 100% / $count;
+  $b: $margin * ($count - 1) / $count;
+  @if $b == 0 {
+    //$c: $a - $b;
+    flex-basis: #{$a};
+    max-width: #{$a};
+    margin-right: 0;
+    &:nth-of-type(#{$count}n+#{$count}){
+      margin-right: 0;
+    }
+    &:last-of-type {
+      margin-right: 0;
+    }
+  } @else {
+    //$c: $a - $b;
+    flex-basis: calc(#{$a} - #{$b});
+    max-width: calc(#{$a} - #{$b});
+    margin-right: $margin;
+    &:nth-of-type(#{$count}n+#{$count}){
+      margin-right: 0;
+    }
+    &:last-of-type {
+      margin-right: auto;
+    }
+  }
+
+}
+
+@mixin ie11 {
+  @media screen and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+    @content;
+  }
+}
+
+@mixin notGrid {
+  @media screen and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+    @content;
+  }
+  @supports not (display: grid) {
+    @content;
+  }
+}
+
+@mixin laptop() {
+  @media screen and (max-height: 800px), screen and (max-width: 1600px) {
+    @content;
+  }
+}

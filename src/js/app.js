@@ -1,8 +1,14 @@
 let isProd = process.env.NODE_ENV == 'production';
 window.$ = window.jQuery = require('jquery');
 import "../styles.sass";
+import Inputmask from "inputmask";
 
 $(document).ready(function () {
+    // inputmask tel
+    let imTel = new Inputmask("+7 (999) 999-99-99");
+    imTel.mask(document.querySelectorAll('input[type=tel]'));
+
+    // tabs if need
     $('[data-tabs]').map((i, tab) => {
         let controlsSelect = $(tab).find('[data-controls-select]');
         let controlsBlock = $(tab).find('[data-controls]');
@@ -22,4 +28,7 @@ $(document).ready(function () {
             blockItems.eq(index).addClass('active');
         });
     });
+
+
+
 });

@@ -13,24 +13,32 @@ require('dotenv').config({path: fs.existsSync('.env') ? '.env' : 'default.env'})
 
 const extractSASS = new ExtractTextPlugin({ filename: '[name].css' });
 
-function getHtmlPluginConfig(HTML_LOADER, page) {
-    console.log('HTML_LOADER', HTML_LOADER);
+function getHtmlPluginConfig(HTML_LOADER, page, jsFiles) {
+    let config = {
+
+    };
+    if (jsFiles.indexOf(page.name) >= 0) {
+        config = Object.assign({}, config, {chunks: ['vendor', 'app', 'dev', page.name]});
+    } else {
+        config = Object.assign({}, config, {chunks: ['vendor', 'app', 'dev']});
+    }
     switch (HTML_LOADER) {
         case 'pug': {
-            return {
+            return Object.assign({},config, {
                 filename: page.name + '.html',
                 template: './src/pages/' + page.name + '.pug',
                 inject: true
-            };
+            });
         }
         default:
-            return {
+            return Object.assign({}, config,{
                 filename: page.name,
                 template: '!!html-loader?interpolate=require!./src/pages/'+page.name+'.html',
-                inject: 'html'
-            };
+                inject: 'html',
+            });
     }
 }
+
 
 function readDir(dir) {
     return new Promise((resolve, reject) => {
@@ -38,18 +46,35 @@ function readDir(dir) {
             if (err) {
                 reject(err)
             } else {
-                resolve(list.filter(elem => path.extname(elem) == '.'+process.env.HTML_LOADER).map(elem => {
-                    return {'name': path.basename(elem, path.extname(elem))};
-                }));
+                resolve(list);
             }
         });
     })
 }
 
+function filterFiles(list, type) {
+    return list.filter(elem => path.extname(elem) == '.'+type).map(elem => {
+        return {'name': path.basename(elem, path.extname(elem))};
+    })
+}
+
 module.exports = async function (env) {
     let pages = await readDir("./src/pages");
+    pages = filterFiles(pages, process.env.HTML_LOADER);
+
+    let jsFiles = await readDir("./src/js");
+    jsFiles = filterFiles(jsFiles, 'js');
+    jsFiles = jsFiles.map(item => item.name);
+    let chunks = (() => {
+        let c = {};
+        jsFiles.map(item => {
+            c[item] = './src/js/' + item + '.js';
+        });
+        return c;
+    })();
+
     const nodeEnv = env && env.prod ? 'production' : 'development';
-    const isProd = env.prod;
+    const isProd = nodeEnv;
     var plugins = [
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
@@ -70,7 +95,7 @@ module.exports = async function (env) {
     for(let i = 0; i < pages.length; i++){
         if(pages[i]){
             let page = pages[i];
-            plugins.push(new HtmlWebpackPlugin(getHtmlPluginConfig(process.env.HTML_LOADER, page)));
+            plugins.push(new HtmlWebpackPlugin(getHtmlPluginConfig(process.env.HTML_LOADER, page, jsFiles)));
         }
     }
 
@@ -101,14 +126,15 @@ module.exports = async function (env) {
             }
         }
     }));
-    let entry = {
-        vendor: [
-            // "jquery",
-            "babel-polyfill"
-        ],
-        app: './src/js/app.js',
-        dev: "./src/js/dev.js"
-    };
+    let entry = Object.assign(
+        {},
+        {
+            vendor: [
+                // "jquery",
+                "@babel/polyfill"
+            ]
+        },
+        chunks);
     return {
         entry: entry,
         output: {
@@ -139,7 +165,7 @@ module.exports = async function (env) {
                                     }
                                 }
                             }},
-                            {loader: 'sass-loader'}
+                            {loader: 'sass-loader', options: {outputStyle: 'expanded'}}
                         ]
                     })
                 },
@@ -173,10 +199,7 @@ module.exports = async function (env) {
                 {
                     test: /\.(js)$/,
                     exclude: /node_modules/,
-                    loader: 'babel-loader',
-                    options: {
-                        presets: ['es2015']
-                    }
+                    loader: 'babel-loader'
                 }
             ]
         },
