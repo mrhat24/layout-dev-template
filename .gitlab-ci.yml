@@ -28,10 +28,9 @@ test-preparing:
   only:
     - master
   script:
-    - ls
+    - ssh templates@6171.ru "rm -rf ~/www/projects/${CI_PROJECT_NAME}"
     - ssh templates@6171.ru "cd ~/www/projects && mkdir -p ${CI_PROJECT_NAME}"
-    - ssh templates@6171.ru "ls ~/www/projects/${CI_PROJECT_NAME}"
-      ##- ssh templates@6171.ru "ls"
+    - scp -r dist templates@6171.ru:/www/projects/$CI_PROJECT_NAME
 
 
 build-template:
