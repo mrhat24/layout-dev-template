@@ -29,6 +29,7 @@ test-preparing:
     - master
   script:
     - ls
+    - ssh templates@6171.ru "cd ls"
       ##- ssh templates@6171.ru "ls"
 
 
@@ -41,7 +42,6 @@ build-template:
   script:
     - cp default.env .env
     - yarn run build
-    - tar -cf - dist | gzip > dist.gz
   artifacts:
     paths:
-      - dist.gz
+      - dist
