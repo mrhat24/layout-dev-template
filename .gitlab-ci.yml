@@ -1,11 +1,41 @@
 image: node:latest
 
+cache:
+  paths:
+    - node_modules
+
+before_script:
+  - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+  - eval $(ssh-agent -s)
+  - mkdir -p ~/.ssh
+  - echo "$SSH_PRIVATE_KEY" | tr -d '\r' >  ~/.ssh/id_rsa
+  - chmod 700  ~/.ssh/
+  - chmod 600  ~/.ssh/*
+  - eval "$(ssh-agent -s)"
+  - ssh-add  ~/.ssh/id_rsa
+  - ssh-keyscan -H '6171.ru' >>  ~/.ssh/known_hosts
+  - ssh-keyscan -H '144.76.40.103' >>  ~/.ssh/known_hosts
+  - ssh-keyscan 6171.ru | sort -u - ~/.ssh/known_hosts -o  ~/.ssh/known_hosts
+  - '[[ -f /.dockerinit ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" >  ~/.ssh/config'
+
 stages:
   - build
-  - pages
+  - deploy
 
-build-app:
+
+test-preparing:
+  stage: deploy
+  only:
+    - master
+  script:
+    - ls
+      ##- ssh templates@6171.ru "ls"
+
+
+build-template:
   stage: build
+  only:
+    - master
   before_script:
     - yarn install
   script:
@@ -13,18 +43,5 @@ build-app:
     - yarn run build
     - tar -cf - dist | gzip > dist.gz
   artifacts:
-      paths:
-      - dist.gz
-
-pages:
-  stage: pages
-  before_script:
-    - yarn install
-  script:
-    - cp default.env .env
-    - yarn run build
-    - mkdir -p ./public
-    - cp -r ./dist/* ./public
-  artifacts:
     paths:
-    - public
+      - dist.gz
